@@ -2,13 +2,18 @@ package tr.megevera.pholi
 
 import java.sql.{Timestamp, PreparedStatement, ResultSet, Connection}
 import java.util.Date
+import org.slf4j.LoggerFactory
 import resultsetextensions._
 
 package object interpolations {
 
+  private val logger = LoggerFactory.getLogger(getClass)
+
   implicit class SqlInterpolations(val sc: StringContext) extends AnyVal {
 
     private def setParameter(ps: PreparedStatement, param: Any, pi: Int): PreparedStatement = {
+
+      logger.trace(s"setting param $param in index $pi in prepared statement $ps")
 
       param match {
         case s: String        => ps.setString(pi, s)
@@ -33,40 +38,55 @@ package object interpolations {
       if (args.isEmpty) {
         ps
       } else {
-        setParameters(setParameter(ps, args.head, pi), args.tail, pi + 1)
+        setParameters(
+          setParameter(ps, args.head, pi),
+          args.tail,
+          pi + 1
+        )
       }
 
     }
 
     def pst(args: Any *)(implicit connection: Connection): PreparedStatement = {
+
       val sqlCommand = sc.parts.mkString("?").stripMargin
+
+      logger.debug(s"preparing statement with sql command: $sqlCommand")
       val preparedStatement = connection.prepareStatement(sqlCommand)
+
       setParameters(preparedStatement, args)
+
     }
 
-    def query(args: Any *)(implicit connection: Connection): ResultSet = {
+    def q(args: Any *)(implicit connection: Connection): ResultSet = {
       if (args.isEmpty) {
+
+        logger.debug(s"creating statement with ${sc.parts.head} and executing query")
         connection.createStatement().executeQuery(sc.parts.head)
+
       } else {
         pst(args)(connection).executeQuery()
       }
     }
 
-    def execute(args: Any *)(implicit connection: Connection): Int = {
+    def exc(args: Any *)(implicit connection: Connection): Int = {
       if (args.isEmpty) {
+
+        logger.debug(s"creating statement with ${sc.parts.head} and executing update")
         connection.createStatement().executeUpdate(sc.parts.head)
+
       } else {
         pst(args)(connection).executeUpdate()
       }
     }
 
-    def list[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): List[T] = query(args)(connection).toList
+    def list[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): List[T] = q(args)(connection).toList
 
-    def seq[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Seq[T] = query(args)(connection).toSeq
+    def seq[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Seq[T] = q(args)(connection).toSeq
 
-    def map[A, B](args: Any *)(implicit connection: Connection, converter: ResultSet => (A, B)): Map[A, B] = query(args)(connection).toMap
+    def map[A, B](args: Any *)(implicit connection: Connection, converter: ResultSet => (A, B)): Map[A, B] = q(args)(connection).toMap
 
-    def opt[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Option[T] = query(args)(connection).headOption
+    def opt[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Option[T] = q(args)(connection).toOption
 
     def get[T](args: Any*)(implicit connection: Connection, converter: ResultSet => T): T = opt(args)(connection, converter).getOrElse(throw new NoSuchElementException)
 

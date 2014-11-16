@@ -18,6 +18,12 @@ package object shortcuts {
 
     }
 
+    def ex(args: Any *)(implicit connectionProvider: ConnectionProvider): Int = Db.op { implicit c =>
+
+      sc.exc(args)
+
+    }
+
     def se[T](args: Any *)(implicit connectionProvider: ConnectionProvider, converter: ResultSet => T): Seq[T] = Db.op { implicit conn =>
 
       sc.seq(args)

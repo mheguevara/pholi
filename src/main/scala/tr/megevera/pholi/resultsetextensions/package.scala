@@ -25,7 +25,7 @@ package object resultsetextensions {
 
     def toMap[A, B](implicit converter: ResultSet => (A, B)): Map[A, B] = it(converter).toMap
 
-    def headOption[T](implicit converter: ResultSet => T): Option[T] = {
+    def toOption[T](implicit converter: ResultSet => T): Option[T] = {
       val _it = it(converter)
       if (_it.hasNext) {
         Option(_it.next())

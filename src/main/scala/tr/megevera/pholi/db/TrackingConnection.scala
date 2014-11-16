@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.mutable.ListBuffer
 
-private object TrackingConnection {
+private[db] object TrackingConnection {
 
   private val logger = LoggerFactory.getLogger(getClass)
 
@@ -28,7 +28,7 @@ private object TrackingConnection {
 
 }
 
-private class TrackingConnection(conn: Connection) extends Connection {
+private[db] class TrackingConnection(conn: Connection) extends Connection {
 
   import TrackingConnection.logger
 
@@ -36,9 +36,9 @@ private class TrackingConnection(conn: Connection) extends Connection {
 
   private def archiveStatement[T <: Statement](f: => T): T = {
     val statement = f
-    logger.trace(s"adding statement: $statement")
-    statements :+ statement
-    logger.trace(s"statements=$statements")
+    logger.debug(s"adding statement: $statement")
+    statements += statement
+    logger.debug(s"statements=$statements")
     statement
   }
 
@@ -123,11 +123,11 @@ private class TrackingConnection(conn: Connection) extends Connection {
   override def getAutoCommit: Boolean = conn.getAutoCommit
 
   override def close(): Unit = {
-    logger.trace("closing all tracked statements")
+    logger.debug("closing all tracked statements")
     statements.foreach(_.close())
-    logger.trace("clearing statements")
+    logger.debug("clearing statements")
     statements.clear()
-    logger.trace("closing underlying connection")
+    logger.debug("closing underlying connection")
     conn.close()
   }
 

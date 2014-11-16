@@ -14,6 +14,7 @@ object Db {
 
     try {
 
+      connection.setAutoCommit(true)
       f(connection)
 
     } catch {
@@ -39,6 +40,7 @@ object Db {
 
     try {
 
+      connection.setAutoCommit(false)
       val result = f(connection)
       connection.commit()
       result
