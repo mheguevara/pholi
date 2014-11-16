@@ -1,40 +1,74 @@
 package tr.megevera.pholi
 
-import java.sql.{PreparedStatement, ResultSet, Connection}
+import java.sql.{Timestamp, PreparedStatement, ResultSet, Connection}
+import java.util.Date
+import resultsetextensions._
 
 package object interpolations {
 
-  private class ResultSetIterator[T](rs: ResultSet, converter: ResultSet => T) extends Iterator[T] {
-
-    override def hasNext: Boolean = rs.next()
-
-    override def next(): T = converter(rs)
-
-  }
-
-  implicit class ResultSetExtensions(val rs: ResultSet) extends AnyVal {
-
-    def it[T](implicit converter: ResultSet => T): Iterator[T] = new ResultSetIterator[T](rs, converter)
-    def toList[T](implicit converter: ResultSet => T): List[T] = it(converter).toList
-    def toSeq[T](implicit converter: ResultSet => T): Seq[T] = it(converter).toSeq
-
-  }
-
   implicit class SqlInterpolations(val sc: StringContext) extends AnyVal {
 
-    def pst(args: Any *)(implicit connection: Connection): PreparedStatement = ???
+    private def setParameter(ps: PreparedStatement, param: Any, pi: Int): PreparedStatement = {
 
-    def query(args: Any *)(implicit connection: Connection): ResultSet = ???
+      param match {
+        case s: String        => ps.setString(pi, s)
+        case i: Int           => ps.setInt(pi, i)
+        case d: Double        => ps.setDouble(pi, d)
+        case l: Long          => ps.setLong(pi, l)
+        case f: Float         => ps.setFloat(pi, f)
+        case s: Short         => ps.setShort(pi, s)
+        case t: Timestamp     => ps.setTimestamp(pi, t)
+        case d: Date          => ps.setTimestamp(pi, new Timestamp(d.getTime))
+        case b: Boolean       => ps.setBoolean(pi, b)
+        case b: Byte          => ps.setByte(pi, b)
+        case bs: Array[Byte]  => ps.setBytes(pi, bs)
+      }
 
-    def execute(args: Any *)(implicit connection: Connection): Int = ???
+      ps
 
-    def list[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): List[T] = ???
+    }
 
-    def map[A, B](args: Any *)(implicit connection: Connection, converter: ResultSet => Tuple2[A, B]): Map[A, B] = ???
+    private def setParameters(ps: PreparedStatement, args: Seq[Any], pi: Int = 1): PreparedStatement = {
 
-    def opt[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Option[T] = ???
+      if (args.isEmpty) {
+        ps
+      } else {
+        setParameters(setParameter(ps, args.head, pi), args.tail, pi + 1)
+      }
 
-    def get[T](args: Any*)(implicit connection: Connection, converter: ResultSet => T): T = ???
+    }
+
+    def pst(args: Any *)(implicit connection: Connection): PreparedStatement = {
+      val sqlCommand = sc.parts.mkString("?").stripMargin
+      val preparedStatement = connection.prepareStatement(sqlCommand)
+      setParameters(preparedStatement, args)
+    }
+
+    def query(args: Any *)(implicit connection: Connection): ResultSet = {
+      if (args.isEmpty) {
+        connection.createStatement().executeQuery(sc.parts.head)
+      } else {
+        pst(args)(connection).executeQuery()
+      }
+    }
+
+    def execute(args: Any *)(implicit connection: Connection): Int = {
+      if (args.isEmpty) {
+        connection.createStatement().executeUpdate(sc.parts.head)
+      } else {
+        pst(args)(connection).executeUpdate()
+      }
+    }
+
+    def list[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): List[T] = query(args)(connection).toList
+
+    def seq[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Seq[T] = query(args)(connection).toSeq
+
+    def map[A, B](args: Any *)(implicit connection: Connection, converter: ResultSet => (A, B)): Map[A, B] = query(args)(connection).toMap
+
+    def opt[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Option[T] = query(args)(connection).headOption
+
+    def get[T](args: Any*)(implicit connection: Connection, converter: ResultSet => T): T = opt(args)(connection, converter).getOrElse(throw new NoSuchElementException)
 
   }
 
