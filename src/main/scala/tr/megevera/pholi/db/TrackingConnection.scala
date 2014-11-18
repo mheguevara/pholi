@@ -77,11 +77,11 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
 
   override def rollback(p1: Savepoint): Unit = conn.rollback(p1)
 
-  override def createStatement(p1: Int, p2: Int): Statement = {
+  override def createStatement(p1: Int, p2: Int): Statement = archiveStatement {
     conn.createStatement(p1, p2)
   }
 
-  override def createStatement(p1: Int, p2: Int, p3: Int): Statement = {
+  override def createStatement(p1: Int, p2: Int, p3: Int): Statement = archiveStatement {
     conn.createStatement(p1, p2, p3)
   }
 
