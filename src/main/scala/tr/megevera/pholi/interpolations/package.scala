@@ -65,7 +65,7 @@ package object interpolations {
         connection.createStatement().executeQuery(sc.parts.head)
 
       } else {
-        pst(args)(connection).executeQuery()
+        pst(args: _*)(connection).executeQuery()
       }
     }
 
@@ -76,19 +76,19 @@ package object interpolations {
         connection.createStatement().executeUpdate(sc.parts.head)
 
       } else {
-        pst(args)(connection).executeUpdate()
+        pst(args: _*)(connection).executeUpdate()
       }
     }
 
-    def list[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): List[T] = q(args)(connection).toList
+    def list[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): List[T] = q(args: _*)(connection).toList
 
-    def seq[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Seq[T] = q(args)(connection).toSeq
+    def seq[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Seq[T] = q(args: _*)(connection).toList(converter).toSeq
 
-    def map[A, B](args: Any *)(implicit connection: Connection, converter: ResultSet => (A, B)): Map[A, B] = q(args)(connection).toMap
+    def map[A, B](args: Any *)(implicit connection: Connection, converter: ResultSet => (A, B)): Map[A, B] = q(args: _*)(connection).toMap
 
-    def opt[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Option[T] = q(args)(connection).toOption
+    def opt[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): Option[T] = q(args: _*)(connection).toOption
 
-    def get[T](args: Any*)(implicit connection: Connection, converter: ResultSet => T): T = opt(args)(connection, converter).getOrElse(throw new NoSuchElementException)
+    def get[T](args: Any *)(implicit connection: Connection, converter: ResultSet => T): T = opt(args: _*)(connection, converter).getOrElse(throw new NoSuchElementException)
 
   }
 

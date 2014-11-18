@@ -20,4 +20,23 @@ object TestCases {
     c.close()
   }
 
+  def insertUsers(users: List[User])(implicit cp: ConnectionProvider) = {
+
+    val c = cp.connection
+    val pst = c.prepareStatement("insert into users(username, email) values(?,?)")
+    val bacth = users.foldLeft(pst) { (pst, user) =>
+
+      pst.setString(1, user.username)
+      pst.setString(2, user.email)
+      pst.addBatch()
+      pst
+
+    }
+
+    bacth.executeBatch()
+    bacth.close()
+    c.close()
+
+  }
+
 }

@@ -14,6 +14,7 @@ import java.sql.Struct
 import java.sql.SQLWarning
 import java.util
 import java.util.Properties
+import java.util.concurrent.Executor
 
 import org.slf4j.LoggerFactory
 
@@ -170,4 +171,15 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
   override def unwrap[T](p1: Class[T]): T = conn.unwrap(p1)
 
   override def isWrapperFor(p1: Class[_]): Boolean = conn.isWrapperFor(p1)
+
+  override def setSchema(schema: String): Unit = conn.setSchema(schema)
+
+  override def getNetworkTimeout: Int = conn.getNetworkTimeout
+
+  override def getSchema: String = conn.getSchema
+
+  override def setNetworkTimeout(executor: Executor, milliseconds: Int): Unit = conn.setNetworkTimeout(executor, milliseconds)
+
+  override def abort(executor: Executor): Unit = conn.abort(executor)
+
 }
