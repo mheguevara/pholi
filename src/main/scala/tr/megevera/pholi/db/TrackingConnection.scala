@@ -35,7 +35,7 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
 
   private val statements = ListBuffer[Statement]()
 
-  private def archiveStatement[T <: Statement](f: => T): T = {
+  private def trackStatement[T <: Statement](f: => T): T = {
     val statement = f
     logger.debug(s"adding statement: $statement")
     statements += statement
@@ -43,7 +43,7 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
     statement
   }
 
-  override def createStatement(): Statement = archiveStatement {
+  override def createStatement(): Statement = trackStatement {
     conn.createStatement()
   }
 
@@ -77,11 +77,11 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
 
   override def rollback(p1: Savepoint): Unit = conn.rollback(p1)
 
-  override def createStatement(p1: Int, p2: Int): Statement = archiveStatement {
+  override def createStatement(p1: Int, p2: Int): Statement = trackStatement {
     conn.createStatement(p1, p2)
   }
 
-  override def createStatement(p1: Int, p2: Int, p3: Int): Statement = archiveStatement {
+  override def createStatement(p1: Int, p2: Int, p3: Int): Statement = trackStatement {
     conn.createStatement(p1, p2, p3)
   }
 
@@ -105,15 +105,15 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
 
   override def nativeSQL(p1: String): String = conn.nativeSQL(p1)
 
-  override def prepareCall(p1: String): CallableStatement = archiveStatement {
+  override def prepareCall(p1: String): CallableStatement = trackStatement {
     conn.prepareCall(p1)
   }
 
-  override def prepareCall(p1: String, p2: Int, p3: Int): CallableStatement = archiveStatement {
+  override def prepareCall(p1: String, p2: Int, p3: Int): CallableStatement = trackStatement {
     conn.prepareCall(p1, p2, p3)
   }
 
-  override def prepareCall(p1: String, p2: Int, p3: Int, p4: Int): CallableStatement = archiveStatement {
+  override def prepareCall(p1: String, p2: Int, p3: Int, p4: Int): CallableStatement = trackStatement {
     conn.prepareCall(p1, p2, p3, p4)
   }
 
@@ -132,27 +132,27 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
     conn.close()
   }
 
-  override def prepareStatement(p1: String): PreparedStatement = archiveStatement {
+  override def prepareStatement(p1: String): PreparedStatement = trackStatement {
     conn.prepareStatement(p1)
   }
 
-  override def prepareStatement(p1: String, p2: Int, p3: Int): PreparedStatement = archiveStatement {
+  override def prepareStatement(p1: String, p2: Int, p3: Int): PreparedStatement = trackStatement {
     conn.prepareStatement(p1, p2, p3)
   }
 
-  override def prepareStatement(p1: String, p2: Int, p3: Int, p4: Int): PreparedStatement = archiveStatement {
+  override def prepareStatement(p1: String, p2: Int, p3: Int, p4: Int): PreparedStatement = trackStatement {
     conn.prepareStatement(p1, p2, p3, p4)
   }
 
-  override def prepareStatement(p1: String, p2: Int): PreparedStatement = archiveStatement {
+  override def prepareStatement(p1: String, p2: Int): PreparedStatement = trackStatement {
     conn.prepareStatement(p1, p2)
   }
 
-  override def prepareStatement(p1: String, p2: Array[Int]): PreparedStatement = archiveStatement {
+  override def prepareStatement(p1: String, p2: Array[Int]): PreparedStatement = trackStatement {
     conn.prepareStatement(p1, p2)
   }
 
-  override def prepareStatement(p1: String, p2: Array[String]): PreparedStatement = archiveStatement {
+  override def prepareStatement(p1: String, p2: Array[String]): PreparedStatement = trackStatement {
     conn.prepareStatement(p1, p2)
   }
 

@@ -1,5 +1,7 @@
 package tr.megevera.pholi.test
 
+import java.sql.ResultSet
+
 import tr.megevera.pholi.db.ConnectionProvider
 
 /**
@@ -8,6 +10,15 @@ import tr.megevera.pholi.db.ConnectionProvider
 object TestCases {
 
   case class User(id: Int, username: String, email: String)
+
+  object User {
+    implicit val rsToUser: ResultSet => User = { rs =>
+      User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
+    }
+    implicit val rsToIdToUser: ResultSet => (Int, User) = { rs =>
+      rs.getInt("id") -> User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
+    }
+  }
 
   def createUsersTable(implicit cp: ConnectionProvider) = {
     val c = cp.connection

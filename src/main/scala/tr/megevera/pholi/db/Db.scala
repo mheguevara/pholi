@@ -3,6 +3,8 @@ package tr.megevera.pholi.db
 import java.sql.Connection
 
 import org.slf4j.LoggerFactory
+import scala.util.{Failure, Success}
+import scala.util.control.{Exception => MException}
 
 object Db {
 
@@ -12,25 +14,29 @@ object Db {
 
     val connection = TrackingConnection(connectionProvider)
 
-    try {
+    MException.
+      allCatch[T].
+      andFinally {
 
-      connection.setAutoCommit(true)
-      f(connection)
+        connection.close()
 
-    } catch {
+      }.withTry {
 
-      case e: Exception => {
+        connection.setAutoCommit(true)
+        f(connection)
 
-        logger.error(e.getMessage, e)
-        throw e
+      } match {
+
+        case Success(result) => result
+
+        case Failure(throwable) => {
+
+          logger.error(throwable.getMessage, throwable)
+          throw throwable
+
+        }
 
       }
-
-    } finally {
-
-      connection.close()
-
-    }
 
   }
 
@@ -38,28 +44,32 @@ object Db {
 
     val connection = TrackingConnection(connectionProvider)
 
-    try {
+    MException.
+      allCatch[T].
+      andFinally {
 
-      connection.setAutoCommit(false)
-      val result = f(connection)
-      connection.commit()
-      result
+        connection.close()
 
-    } catch {
+      }.withTry {
 
-      case e: Exception => {
+        connection.setAutoCommit(false)
+        val result = f(connection)
+        connection.commit()
+        result
 
-        logger.error(e.getMessage, e)
-        connection.rollback()
-        throw e
+      } match {
+
+        case Success(result) => result
+
+        case Failure(throwable) => {
+
+          logger.error(throwable.getMessage, throwable)
+          connection.rollback()
+          throw throwable
+
+        }
 
       }
-
-    } finally {
-
-      connection.close()
-
-    }
 
   }
 

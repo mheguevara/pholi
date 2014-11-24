@@ -20,10 +20,6 @@ class InterpolationsSpec extends Specification {
       TestCases.createUsersTable
       TestCases.insertUsers(List(User(0, "m", "e"), User(1, "s", "e")))
 
-      implicit val rsToUser: ResultSet => User = { rs =>
-        User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
-      }
-
       val users: List[User] = Db.op { implicit c =>
         list"select id, username, email from users"
       }
@@ -38,10 +34,6 @@ class InterpolationsSpec extends Specification {
 
       TestCases.createUsersTable
       TestCases.insertUsers(List(User(0, "m", "e"), User(1, "s", "e")))
-
-      implicit val rsToUser: ResultSet => User = { rs =>
-        User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
-      }
 
       val users: Seq[User] = Db.op { implicit c =>
         seq"select id, username, email from users"
@@ -58,10 +50,6 @@ class InterpolationsSpec extends Specification {
       TestCases.createUsersTable
       TestCases.insertUsers(List(User(0, "m", "e"), User(1, "s", "e")))
 
-      implicit val rsToUser: ResultSet => (Int, User) = { rs =>
-        rs.getInt("id") -> User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
-      }
-
       val users: Map[Int, User] = Db.op { implicit c =>
         map"select id, username, email from users"
       }
@@ -76,10 +64,6 @@ class InterpolationsSpec extends Specification {
 
       TestCases.createUsersTable
       TestCases.insertUsers(List(User(0, "m", "e"), User(1, "s", "e")))
-
-      implicit val rsToUser: ResultSet => User = { rs =>
-        User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
-      }
 
       def users(id: Int): Option[User] = Db.op { implicit c =>
         opt"select id, username, email from users where id = $id"
@@ -113,10 +97,6 @@ class InterpolationsSpec extends Specification {
 
       TestCases.createUsersTable
       TestCases.insertUsers(List(User(0, "m", "e"), User(1, "s", "e")))
-
-      implicit val rsToUser: ResultSet => User = { rs =>
-        User(rs.getInt("id"), rs.getString("username"), rs.getString("email"))
-      }
 
       val users: List[User] = Db.op { implicit c =>
         q"select id, username, email from users".toList
