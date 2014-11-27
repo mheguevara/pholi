@@ -1,9 +1,10 @@
 package tr.megevera.pholi
 
-import java.sql.{Timestamp, PreparedStatement, ResultSet, Connection}
+import java.sql.{Connection, PreparedStatement, ResultSet, Timestamp}
 import java.util.Date
+
 import org.slf4j.LoggerFactory
-import resultsetextensions._
+import tr.megevera.pholi.resultsetextensions._
 
 package object interpolations {
 

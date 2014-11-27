@@ -1,9 +1,9 @@
 package tr.megevera.pholi.test
 
-import java.sql.{DriverManager, Connection}
+import java.sql.{Connection, DriverManager}
 import java.util.UUID
 
-import org.specs2.execute.{Result, AsResult}
+import org.specs2.execute.{AsResult, Result}
 import org.specs2.mutable.Around
 import org.specs2.specification.Scope
 import tr.megevera.pholi.db.ConnectionProvider

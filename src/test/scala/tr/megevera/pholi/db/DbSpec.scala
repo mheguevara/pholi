@@ -1,6 +1,6 @@
 package tr.megevera.pholi.db
 
-import java.sql.Connection // seda
+import java.sql.Connection
 
 import org.specs2.mutable.Specification
 import tr.megevera.pholi.test.{TestCases, TestContext}

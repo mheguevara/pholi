@@ -1,17 +1,7 @@
 package tr.megevera.pholi.db
 
-import java.sql.Connection
-import java.sql.Statement
-import java.sql.Blob
-import java.sql.SQLXML
-import java.sql.NClob
-import java.sql.Savepoint
-import java.sql.DatabaseMetaData
-import java.sql.Clob
-import java.sql.CallableStatement
-import java.sql.PreparedStatement
-import java.sql.Struct
-import java.sql.SQLWarning
+import java.sql.{ SQLWarning, Struct, PreparedStatement, SQLException, CallableStatement, Clob }
+import java.sql.{ DatabaseMetaData, Savepoint, NClob, SQLXML, Blob, Statement, Connection}
 import java.util
 import java.util.Properties
 import java.util.concurrent.Executor
@@ -31,7 +21,7 @@ private[db] object TrackingConnection {
 
 private[db] class TrackingConnection(conn: Connection) extends Connection {
 
-  import TrackingConnection.logger
+  import tr.megevera.pholi.db.TrackingConnection.logger
 
   private val statements = ListBuffer[Statement]()
 
@@ -125,7 +115,17 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
 
   override def close(): Unit = {
     logger.debug("closing all tracked statements")
-    statements.foreach(_.close())
+    statements foreach { statement =>
+
+      try {
+        statement.close()
+      } catch {
+        case e: SQLException => {
+          logger.error(e.getMessage, e)
+        }
+      }
+
+    }
     logger.debug("clearing statements")
     statements.clear()
     logger.debug("closing underlying connection")

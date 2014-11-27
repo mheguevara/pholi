@@ -3,8 +3,9 @@ package tr.megevera.pholi.db
 import java.sql.Connection
 
 import org.slf4j.LoggerFactory
-import scala.util.{Failure, Success}
+
 import scala.util.control.{Exception => MException}
+import scala.util.{Failure, Success}
 
 object Db {
 

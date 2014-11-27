@@ -1,12 +1,10 @@
 package tr.megevera.pholi.interpolations
 
-import java.sql.ResultSet
-
 import org.specs2.mutable.Specification
 import tr.megevera.pholi.db.Db
+import tr.megevera.pholi.resultsetextensions._
 import tr.megevera.pholi.test.TestCases.User
 import tr.megevera.pholi.test.{TestCases, TestContext}
-import tr.megevera.pholi.resultsetextensions._
 
 /**
  * Created by alaym on 18.11.2014.

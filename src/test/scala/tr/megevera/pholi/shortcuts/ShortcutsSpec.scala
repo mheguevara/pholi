@@ -1,8 +1,6 @@
 package tr.megevera.pholi.shortcuts
 
 import org.specs2.mutable.Specification
-import tr.megevera.pholi.db.Db
-import tr.megevera.pholi.shortcuts._
 import tr.megevera.pholi.test.TestCases.User
 import tr.megevera.pholi.test.{TestCases, TestContext}
 

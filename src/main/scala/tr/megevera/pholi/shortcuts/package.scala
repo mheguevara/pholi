@@ -2,8 +2,8 @@ package tr.megevera.pholi
 
 import java.sql.ResultSet
 
-import interpolations._
-import tr.megevera.pholi.db.{Db, ConnectionProvider}
+import tr.megevera.pholi.db.{ConnectionProvider, Db}
+import tr.megevera.pholi.interpolations._
 
 /**
  * Created by alaym on 16.11.2014.
