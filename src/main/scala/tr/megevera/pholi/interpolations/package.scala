@@ -1,6 +1,8 @@
 package tr.megevera.pholi
 
-import java.sql.{Connection, PreparedStatement, ResultSet, Timestamp}
+import java.net.URL
+import java.sql.{ Connection, PreparedStatement, ResultSet, Timestamp }
+import java.sql.{ Ref, SQLXML }
 import java.util.Date
 
 import org.slf4j.LoggerFactory
@@ -17,17 +19,22 @@ package object interpolations {
       logger.trace(s"setting param $param in index $pi in prepared statement $ps")
 
       param match {
-        case s: String        => ps.setString(pi, s)
-        case i: Int           => ps.setInt(pi, i)
-        case d: Double        => ps.setDouble(pi, d)
-        case l: Long          => ps.setLong(pi, l)
-        case f: Float         => ps.setFloat(pi, f)
-        case s: Short         => ps.setShort(pi, s)
-        case t: Timestamp     => ps.setTimestamp(pi, t)
-        case d: Date          => ps.setTimestamp(pi, new Timestamp(d.getTime))
-        case b: Boolean       => ps.setBoolean(pi, b)
-        case b: Byte          => ps.setByte(pi, b)
-        case bs: Array[Byte]  => ps.setBytes(pi, bs)
+        case s: String                => ps.setString(pi, s)
+        case i: Int                   => ps.setInt(pi, i)
+        case d: Double                => ps.setDouble(pi, d)
+        case l: Long                  => ps.setLong(pi, l)
+        case f: Float                 => ps.setFloat(pi, f)
+        case s: Short                 => ps.setShort(pi, s)
+        case t: Timestamp             => ps.setTimestamp(pi, t)
+        case d: Date                  => ps.setTimestamp(pi, new Timestamp(d.getTime))
+        case b: Boolean               => ps.setBoolean(pi, b)
+        case b: Byte                  => ps.setByte(pi, b)
+        case bs: Array[Byte]          => ps.setBytes(pi, bs)
+        case a: java.sql.Array        => ps.setArray(pi, a)
+        case bd: java.math.BigDecimal => ps.setBigDecimal(pi, bd)
+        case ref: Ref                 => ps.setRef(pi, ref)
+        case sqlXml: SQLXML           => ps.setSQLXML(pi, sqlXml)
+        case url: URL                 => ps.setURL(pi, url)
       }
 
       ps
