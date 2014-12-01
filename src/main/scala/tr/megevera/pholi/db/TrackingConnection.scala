@@ -7,6 +7,7 @@ import java.util.Properties
 import java.util.concurrent.Executor
 
 import org.slf4j.LoggerFactory
+import tr.megevera.pholi.statementQueryTimeout
 
 import scala.collection.mutable.ListBuffer
 
@@ -30,6 +31,7 @@ private[db] class TrackingConnection(conn: Connection) extends Connection {
     logger.debug(s"adding statement: $statement")
     statements += statement
     logger.debug(s"statements=$statements")
+    statement.setQueryTimeout(statementQueryTimeout)
     statement
   }
 

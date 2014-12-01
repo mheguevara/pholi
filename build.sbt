@@ -10,6 +10,7 @@ crossScalaVersions := Seq("2.10.4", "2.11.4")
 
 libraryDependencies ++= Seq(
   "org.slf4j" % "slf4j-api" % "1.7.7",
+  "com.typesafe" % "config" % "1.2.1",
   "org.specs2" %% "specs2-core" % "2.4.11" % "test",
   "com.h2database" % "h2" % "1.4.182" % "test"
 )
